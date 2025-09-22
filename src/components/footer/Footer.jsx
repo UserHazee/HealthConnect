@@ -7,7 +7,7 @@ export function Footer() {
                     {/* Brand */}
                     <div className="md:col-span-1">
                         <div className="flex items-center gap-2 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="inline" width="35" height="35" viewBox="0 0 512 512"><path fill="#FFFFFF" fill-rule="evenodd" d="M433.256 101.735c29.053 30.388 40.558 72.179 34.517 111.598h-43.409c6.515-28.563-.801-59.995-21.948-82.113c-31.299-32.737-81.216-32.737-112.515 0L256 166.679l-33.902-35.46c-31.299-32.737-81.216-32.737-112.515 0c-21.147 22.119-28.463 53.551-21.948 82.114H44.227c-6.042-39.419 5.464-81.211 34.516-111.599c44.631-46.68 114.991-50.05 163.335-10.107a127 127 0 0 1 10.86 10.107l3.062 3.203l3.061-3.202c3.472-3.631 7.099-7 10.86-10.108c48.345-39.943 118.704-36.574 163.335 10.108M360.14 298.667h59.03L256 469.333L92.83 298.667h59.029L256 407.592zM192 122.964l-55.872 111.703H42.667v42.666h119.851L192 218.368l64 128.001l34.517-69.036h178.816v-42.666H311.851L288 186.964l-32 63.98z" clip-rule="evenodd" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="inline" width="35" height="35" viewBox="0 0 512 512"><path fill="#FFFFFF" fillRule="evenodd" d="M433.256 101.735c29.053 30.388 40.558 72.179 34.517 111.598h-43.409c6.515-28.563-.801-59.995-21.948-82.113c-31.299-32.737-81.216-32.737-112.515 0L256 166.679l-33.902-35.46c-31.299-32.737-81.216-32.737-112.515 0c-21.147 22.119-28.463 53.551-21.948 82.114H44.227c-6.042-39.419 5.464-81.211 34.516-111.599c44.631-46.68 114.991-50.05 163.335-10.107a127 127 0 0 1 10.86 10.107l3.062 3.203l3.061-3.202c3.472-3.631 7.099-7 10.86-10.108c48.345-39.943 118.704-36.574 163.335 10.108M360.14 298.667h59.03L256 469.333L92.83 298.667h59.029L256 407.592zM192 122.964l-55.872 111.703H42.667v42.666h119.851L192 218.368l64 128.001l34.517-69.036h178.816v-42.666H311.851L288 186.964l-32 63.98z" clip-rule="evenodd" /></svg>
                             <h2 className="text-white text-xl font-bold">HealthConnect</h2>
                         </div>
                         <p className="text-gray-400 text-sm">
@@ -125,6 +125,7 @@ export function Footer() {
                                 aria-hidden="true"
                                 className="h-6 w-6"
                                 fill="currentColor"
+                                fillRule="evenodd"
                                 viewBox="0 0 24 24"
                             >
                                 <path
@@ -147,6 +148,7 @@ export function Footer() {
                                 aria-hidden="true"
                                 className="h-6 w-6"
                                 fill="currentColor"
+                                fillRule="evenodd"
                                 viewBox="0 0 24 24"
                             >
                                 <path d="M8.29 20.251c7.547 0 11.675-6.253 
@@ -171,6 +173,7 @@ export function Footer() {
                                 aria-hidden="true"
                                 className="h-6 w-6"
                                 fill="currentColor"
+                                fillRule="evenodd"
                                 viewBox="0 0 24 24"
                             >
                                 <path

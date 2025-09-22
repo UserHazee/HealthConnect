@@ -4,6 +4,7 @@ import { NavbarBrand } from "./NavbarBrand";
 import { NavbarLinks } from "./NavbarLinks";
 import { NavbarToggle } from "./NavbarToggle";
 import { NavbarLinksLogin } from "./NavbarLinks";
+import { NavbarLinksSignup } from "./NavbarLinks";
 
 const navItems = [
   { label: "Features", href: "features" },
@@ -42,7 +43,6 @@ export function Navbar() {
 
 // This is for Login Page Navbar
 export function NavbarLogin() {
-    const [isOpen, setIsOpen] = useState(false);
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
             <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -51,8 +51,29 @@ export function NavbarLogin() {
                     <NavbarBrand title="HealthConnect" href="/" />
 
                      {/* Desktop Links */}
-                    <div className="space-x-8 flex">
+                    <div className="flex space-x-8">
                         <NavbarLinksLogin items={navItems} />
+                    </div>
+                </div>
+            </div>
+
+         
+        </header>
+    );
+}
+
+// This is for Signup Page Navbar
+export function NavbarSignup() {
+    return (
+        <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+            <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16">
+                    {/* {Brand} */}
+                    <NavbarBrand title="HealthConnect" href="/" />
+
+                     {/* Desktop Links */}
+                    <div className="flex space-x-8">
+                        <NavbarLinksSignup items={navItems} />
                     </div>
                 </div>
             </div>

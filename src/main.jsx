@@ -1,35 +1,10 @@
-// src/main.jsx
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
 import "./index.css";
 
-import Index from "./Index.jsx";
-import SignIn from "./auth/Login.jsx";
-
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* Homepage */}
-        <Route path="/" element={<Index />} />
-
-        {/* Login page */}
-        <Route path="/login" element={<SignIn />} />
-
-        {/* Dashboard (for after login) */}
-        <Route path="/dashboard" element={<Index />} />
-
-        {/* Fallback: redirect to home */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
     <App />
-  </StrictMode>
+  </React.StrictMode>
 );

@@ -29,9 +29,9 @@ export function FAQSection() {
 
   return (
     <section className="py-20 bg-white" id="faq">
-      <div className="container mx-auto px-4">
+      <div className="container px-4 mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Frequently Asked Questions
           </h2>
@@ -42,18 +42,18 @@ export function FAQSection() {
 
         {/* FAQ Items */}
         <div className="max-w-4xl mx-auto space-y-4">
-          {faqs.map((faq, index) => (
+          {faqs.map((faq) => (
             <details
-              key={index}
+              key={faq.question}
               className="group rounded-lg bg-gray-50 p-6 [&_summary::-webkit-details-marker]:hidden"
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
                 <h3 className="text-lg font-medium">{faq.question}</h3>
                 <span className="relative size-5 shrink-0">
-                  <span className="material-symbols-outlined absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity">
+                  <span className="absolute inset-0 transition-opacity opacity-100 material-symbols-outlined size-5 group-open:opacity-0">
                     add
                   </span>
-                  <span className="material-symbols-outlined absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity">
+                  <span className="absolute inset-0 transition-opacity opacity-0 material-symbols-outlined size-5 group-open:opacity-100">
                     remove
                   </span>
                 </span>

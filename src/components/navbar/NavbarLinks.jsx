@@ -17,7 +17,7 @@ export function NavbarLinks({ items, isMobile = false }) {
           <button
             href={item.href}
              onClick={() => scrollToSection(item.href)}
-            className="cursor-pointer text-gray-700 transition-colors duration-200 hover:text-blue-600"
+            className="text-gray-700 transition-colors duration-200 cursor-pointer hover:text-blue-600"
           >
             {item.label}
           </button>
@@ -32,7 +32,16 @@ export function NavbarLinks({ items, isMobile = false }) {
 export function NavbarLinksLogin() {
   return (
     <ul className={`flex items-center space-x-10`}>
-      <li><PrimaryButton>Register</PrimaryButton></li>
+      <li><Link  to="/register"><PrimaryButton>Register</PrimaryButton></Link></li>
+    </ul>
+  );
+}
+
+// Navlinks For Signup Page 
+export function NavbarLinksSignup() {
+  return (
+    <ul className={`flex items-center space-x-10`}>
+      <li><Link to="/login"><PrimaryButton>Login</PrimaryButton></Link></li>
     </ul>
   );
 }
