@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import {
     Calendar,
     Clock,
@@ -76,6 +77,10 @@ export default function AppointmentHistory() {
             statusColor: "bg-green-100 text-green-700 border-green-200"
         }
     ];
+      useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []); // The empty dependency array ensures this runs only once, on mount
+    
 
     return (
        <Layout>

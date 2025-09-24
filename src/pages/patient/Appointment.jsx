@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import {
     Calendar,
     Clock,
@@ -57,6 +58,10 @@ export default function AppointmentBooking() {
             setSelectedDate(`${month.split(' ')[0]} ${day.day}, ${month.split(' ')[1]}`);
         }
     };
+      useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []); // The empty dependency array ensures this runs only once, on mount
+    
 
     return (<Layout>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30" style={{ fontFamily: `Inter, "Noto Sans", sans-serif` }}>

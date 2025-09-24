@@ -1,9 +1,8 @@
-// src/auth/PrivateRoute.jsx
 import { Navigate } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
 
 export default function PrivateRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
 
   if (loading)
     return (
@@ -12,7 +11,12 @@ export default function PrivateRoute({ children }) {
       </div>
     );
 
+  // keep this important security check
   if (!user) return <Navigate to="/login" replace />;
 
-  return children;
+  // If AuthContext doesn't provide isAuthenticated, fallback to !!user
+  const allowed = typeof isAuthenticated === "boolean" ? isAuthenticated : !!user;
+
+  // <-- IMPORTANT: return the JSX
+  return allowed ? children : <Navigate to="/login" replace />;
 }

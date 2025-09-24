@@ -13,10 +13,13 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState("");
 
-  // Fetch current user if token exists
+  // 🔹 Fetch current user if token exists
   useEffect(() => {
     const fetchUser = async () => {
-      if (!token) return setLoading(false);
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const res = await fetch(`${API_URL}/auth/me`, {
@@ -75,8 +78,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-
-  // Logout clears both local & session storage
+  // 🔹 Logout clears both local & session storage
   const logout = () => {
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
@@ -85,7 +87,17 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading, authError }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated: !!token, // ✅ smoother remember me
+        login,
+        logout,
+        loading,
+        authError,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

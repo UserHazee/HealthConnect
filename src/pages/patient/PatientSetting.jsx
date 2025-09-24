@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import {
     Calendar,
     Clock,
@@ -55,6 +56,10 @@ export default function PatientSettings() {
         setNewPassword("");
         setConfirmPassword("");
     };
+      useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []); // The empty dependency array ensures this runs only once, on mount
+    
 
     return (
         <Layout>

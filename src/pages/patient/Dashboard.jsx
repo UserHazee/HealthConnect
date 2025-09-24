@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import Layout from "../../components/ui/layout";
-
+import { useEffect } from "react";
 export default function Dashboard() {
     const upcomingAppointments = [
         {
@@ -37,6 +37,10 @@ export default function Dashboard() {
             icon: Calendar,
         },
     ];
+ // Use a useEffect hook to scroll to the top when the component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []); // The empty dependency array ensures this runs only once, on mount
 
     return (
         <Layout>
@@ -156,49 +160,49 @@ export default function Dashboard() {
             </section>
             {/* Quick Stats Grid */}
             <section>
-                <h2 className="text-xl lg:text-2xl font-bold text-slate-800 mb-6">
+                <h2 className="mb-6 text-xl font-bold lg:text-2xl text-slate-800">
                     Health Summary
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-blue-600 text-sm font-medium mb-1">Total Visits</p>
+                                    <p className="mb-1 text-sm font-medium text-blue-600">Total Visits</p>
                                     <p className="text-2xl font-bold text-slate-800">24</p>
-                                    <p className="text-slate-500 text-sm">This year</p>
+                                    <p className="text-sm text-slate-500">This year</p>
                                 </div>
-                                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                                <div className="flex items-center justify-center w-12 h-12 bg-blue-500 rounded-xl">
                                     <Calendar className="w-6 h-6 text-white" />
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+                    <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-purple-600 text-sm font-medium mb-1">Next Checkup</p>
+                                    <p className="mb-1 text-sm font-medium text-purple-600">Next Checkup</p>
                                     <p className="text-2xl font-bold text-slate-800">15</p>
-                                    <p className="text-slate-500 text-sm">Days away</p>
+                                    <p className="text-sm text-slate-500">Days away</p>
                                 </div>
-                                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+                                <div className="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-xl">
                                     <Clock className="w-6 h-6 text-white" />
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                    <Card className="border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-green-600 text-sm font-medium mb-1">Health Score</p>
+                                    <p className="mb-1 text-sm font-medium text-green-600">Health Score</p>
                                     <p className="text-2xl font-bold text-slate-800">92%</p>
-                                    <p className="text-slate-500 text-sm">Excellent</p>
+                                    <p className="text-sm text-slate-500">Excellent</p>
                                 </div>
-                                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                                <div className="flex items-center justify-center w-12 h-12 bg-green-500 rounded-xl">
                                     <User className="w-6 h-6 text-white" />
                                 </div>
                             </div>

@@ -1,27 +1,42 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/AuthContext";
 export function Footer() {
+
+    const navigate = useNavigate();
+    const { token, user, loading } = useAuth(); // 👈 get user + loading
+
+    const handleBookAppointment = () => {
+        if (loading) return; // 🚫 don’t navigate while still fetching user
+
+        if (token && user) {
+            navigate("/dashboard"); // ✅ only go if user confirmed
+        } else {
+            navigate("/login");
+        }
+    }
     return (
-        <footer className="bg-gray-800 text-white pt-12 pb-8">
-            <div className="container mx-auto px-6 lg:px-8">
+        <footer className="pt-12 pb-8 text-white bg-gray-800">
+            <div className="container px-6 mx-auto lg:px-8">
                 {/* Grid Section */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
                     {/* Brand */}
                     <div className="md:col-span-1">
                         <div className="flex items-center gap-2 mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" className="inline" width="35" height="35" viewBox="0 0 512 512"><path fill="#FFFFFF" fillRule="evenodd" d="M433.256 101.735c29.053 30.388 40.558 72.179 34.517 111.598h-43.409c6.515-28.563-.801-59.995-21.948-82.113c-31.299-32.737-81.216-32.737-112.515 0L256 166.679l-33.902-35.46c-31.299-32.737-81.216-32.737-112.515 0c-21.147 22.119-28.463 53.551-21.948 82.114H44.227c-6.042-39.419 5.464-81.211 34.516-111.599c44.631-46.68 114.991-50.05 163.335-10.107a127 127 0 0 1 10.86 10.107l3.062 3.203l3.061-3.202c3.472-3.631 7.099-7 10.86-10.108c48.345-39.943 118.704-36.574 163.335 10.108M360.14 298.667h59.03L256 469.333L92.83 298.667h59.029L256 407.592zM192 122.964l-55.872 111.703H42.667v42.666h119.851L192 218.368l64 128.001l34.517-69.036h178.816v-42.666H311.851L288 186.964l-32 63.98z" clip-rule="evenodd" /></svg>
-                            <h2 className="text-white text-xl font-bold">HealthConnect</h2>
+                            <h2 className="text-xl font-bold text-white">HealthConnect</h2>
                         </div>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-sm text-gray-400">
                             Simplifying your access to healthcare, one appointment at a time.
                         </p>
                     </div>
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
+                        <h3 className="mb-4 text-lg font-semibold text-white">Quick Links</h3>
                         <ul className="space-y-2">
                             <li>
                                 <a
-                                    className="text-gray-400 hover:text-white transition-colors"
+                                    className="text-gray-400 transition-colors hover:text-white"
                                     href="#features"
                                 >
                                     Features
@@ -29,7 +44,7 @@ export function Footer() {
                             </li>
                             <li>
                                 <a
-                                    className="text-gray-400 hover:text-white transition-colors"
+                                    className="text-gray-400 transition-colors hover:text-white"
                                     href="#testimonials"
                                 >
                                     Testimonials
@@ -37,30 +52,30 @@ export function Footer() {
                             </li>
                             <li>
                                 <a
-                                    className="text-gray-400 hover:text-white transition-colors"
+                                    className="text-gray-400 transition-colors hover:text-white"
                                     href="#faq"
                                 >
                                     FAQ
                                 </a>
                             </li>
                             <li>
-                                <a
-                                    className="text-gray-400 hover:text-white transition-colors"
-                                    href="#booking"
+                                <button
+                                    className="text-gray-400 transition-colors hover:text-white"
+                                    onClick={handleBookAppointment}
                                 >
                                     Book Now
-                                </a>
+                                </button>
                             </li>
                         </ul>
                     </div>
 
                     {/* Legal */}
                     <div>
-                        <h3 className="text-lg font-semibold text-white mb-4">Legal</h3>
+                        <h3 className="mb-4 text-lg font-semibold text-white">Legal</h3>
                         <ul className="space-y-2">
                             <li>
                                 <a
-                                    className="text-gray-400 hover:text-white transition-colors"
+                                    className="text-gray-400 transition-colors hover:text-white"
                                     href="#"
                                 >
                                     Privacy Policy
@@ -68,7 +83,7 @@ export function Footer() {
                             </li>
                             <li>
                                 <a
-                                    className="text-gray-400 hover:text-white transition-colors"
+                                    className="text-gray-400 transition-colors hover:text-white"
                                     href="#"
                                 >
                                     Terms of Service
@@ -79,27 +94,27 @@ export function Footer() {
 
                     {/* Contact */}
                     <div>
-                        <h3 className="text-lg font-semibold text-white mb-4">Contact Us</h3>
+                        <h3 className="mb-4 text-lg font-semibold text-white">Contact Us</h3>
                         <ul className="space-y-2 text-gray-400">
                             <li className="flex items-start">
-                                <span className="material-symbols-outlined text-lg mr-2 mt-1">
+                                <span className="mt-1 mr-2 text-lg material-symbols-outlined">
                                     location_on
                                 </span>
                                 <span>123 Health St, Wellness City, HC 45678</span>
                             </li>
                             <li className="flex items-center">
-                                <span className="material-symbols-outlined text-lg mr-2">call</span>
+                                <span className="mr-2 text-lg material-symbols-outlined">call</span>
                                 <a
-                                    className="hover:text-white transition-colors"
+                                    className="transition-colors hover:text-white"
                                     href="tel:+1234567890"
                                 >
                                     (123) 456-7890
                                 </a>
                             </li>
                             <li className="flex items-center">
-                                <span className="material-symbols-outlined text-lg mr-2">email</span>
+                                <span className="mr-2 text-lg material-symbols-outlined">email</span>
                                 <a
-                                    className="hover:text-white transition-colors"
+                                    className="transition-colors hover:text-white"
                                     href="mailto:contact@healthconnect.com"
                                 >
                                     contact@healthconnect.com
@@ -110,20 +125,20 @@ export function Footer() {
                 </div>
 
                 {/* Bottom Section */}
-                <div className="mt-8 border-t border-gray-700 pt-8 flex flex-col md:flex-row items-center justify-between">
+                <div className="flex flex-col items-center justify-between pt-8 mt-8 border-t border-gray-700 md:flex-row">
                     <p className="text-sm text-gray-400">
                         © 2024 HealthConnect. All rights reserved.
                     </p>
 
                     {/* Social Links */}
-                    <div className="flex space-x-4 mt-4 md:mt-0">
+                    <div className="flex mt-4 space-x-4 md:mt-0">
                         <a
-                            className="text-gray-400 hover:text-white transition-colors"
+                            className="text-gray-400 transition-colors hover:text-white"
                             href="#"
                         >
                             <svg
                                 aria-hidden="true"
-                                className="h-6 w-6"
+                                className="w-6 h-6"
                                 fill="currentColor"
                                 fillRule="evenodd"
                                 viewBox="0 0 24 24"
@@ -141,12 +156,12 @@ export function Footer() {
                             </svg>
                         </a>
                         <a
-                            className="text-gray-400 hover:text-white transition-colors"
+                            className="text-gray-400 transition-colors hover:text-white"
                             href="#"
                         >
                             <svg
                                 aria-hidden="true"
-                                className="h-6 w-6"
+                                className="w-6 h-6"
                                 fill="currentColor"
                                 fillRule="evenodd"
                                 viewBox="0 0 24 24"
@@ -166,12 +181,12 @@ export function Footer() {
                             </svg>
                         </a>
                         <a
-                            className="text-gray-400 hover:text-white transition-colors"
+                            className="text-gray-400 transition-colors hover:text-white"
                             href="#"
                         >
                             <svg
                                 aria-hidden="true"
-                                className="h-6 w-6"
+                                className="w-6 h-6"
                                 fill="currentColor"
                                 fillRule="evenodd"
                                 viewBox="0 0 24 24"
