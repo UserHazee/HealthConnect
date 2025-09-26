@@ -261,17 +261,6 @@ export default function AppointmentBooking() {
                                             Find and schedule your next medical appointment
                                         </p>
                                     </div>
-                                    <div className="flex gap-3">
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="text-sm"
-                                            onClick={fetchAppointments}
-                                        >
-                                            <History className="w-4 h-4 mr-2" />
-                                            History
-                                        </Button>
-                                    </div>
                                 </div>
                             </div>
 
@@ -478,42 +467,6 @@ export default function AppointmentBooking() {
                                                 </div>
                                             </CardContent>
                                         </Card>
-
-                                        {/* History list */}
-                                        {appointments.length > 0 && (
-                                            <Card className="mt-6 shadow-lg">
-                                                <CardContent className="p-6">
-                                                    <h3 className="mb-4 text-lg font-semibold">Your Appointments</h3>
-                                                    <ul className="space-y-2">
-                                                        {appointments.map((a) => (
-                                                            <li
-                                                                key={a.id}
-                                                                className="flex items-center justify-between pb-2 border-b"
-                                                            >
-                                                                <span>
-                                                                    {a.department} - {a.doctor} <br />
-                                                                    {new Date(
-                                                                        a.appointment_date + "T00:00:00"
-                                                                    ).toLocaleDateString("en-US", {
-                                                                        month: "long",
-                                                                        day: "numeric",
-                                                                        year: "numeric",
-                                                                    })}{" "}
-                                                                    @ {a.appointment_time}
-                                                                </span>
-                                                                <Button
-                                                                    size="sm"
-                                                                    variant="destructive"
-                                                                    onClick={() => cancelAppointment(a.id)}
-                                                                >
-                                                                    Cancel
-                                                                </Button>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </CardContent>
-                                            </Card>
-                                        )}
                                     </div>
                                 </div>
                             </div>
