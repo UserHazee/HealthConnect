@@ -95,40 +95,33 @@ export default function AppointmentBooking() {
     // Fetch appointments (used by History button and on mount)
     // tries backend when token exists, falls back to localStorage
     // -----------------------
-    const fetchAppointments = async () => {
-        // try backend if token present
-        if (token) {
-            try {
-                const res = await fetch("/api/appointments", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    setAppointments(data);
-                    // keep local copy as fallback
-                    localStorage.setItem("appointments", JSON.stringify(data));
-                    return;
-                }
-                // if not ok, fall through to localStorage fallback
-                console.warn("Fetch appointments backend returned not ok, falling back to localStorage");
-            } catch (err) {
-                console.warn("Fetch appointments backend failed, falling back to localStorage", err);
+   const fetchAppointments = async () => {
+    if (token) {
+        try {
+            const res = await fetch("/api/appointments", {
+                headers: { Authorization: `Bearer ${token}` },
+                cache: "no-store",
+            });
+            if (res.ok) {
+                const data = await res.json();
+                console.log("🔍 All appointments from API:", data);
+                
+                // ✅ Filter to only current user's appointments
+                const userAppointments = data.filter(apt => apt.userId === user.id);
+                console.log(`✅ Filtered appointments for user ${user.id}:`, userAppointments);
+                
+                setAppointments(userAppointments);
+                localStorage.setItem("appointments", JSON.stringify(userAppointments));
+                return;
             }
+            console.warn("Fetch appointments backend returned not ok, falling back to localStorage");
+        } catch (err) {
+            console.warn("Fetch appointments backend failed, falling back to localStorage", err);
         }
+    }
 
-        // fallback to localStorage
-        const stored = localStorage.getItem("appointments");
-        if (stored) {
-            try {
-                setAppointments(JSON.parse(stored));
-            } catch (err) {
-                console.error("Failed parsing appointments from localStorage", err);
-                setAppointments([]);
-            }
-        } else {
-            setAppointments([]);
-        }
-    };
+    // ... rest of fallback code
+};
 
     // -----------------------
     // Book appointment
@@ -162,6 +155,8 @@ export default function AppointmentBooking() {
                         appointment_date: newAppointment.appointment_date,
                         appointment_time: newAppointment.appointment_time,
                     }),
+
+                    cache: "no-store",   // 🚀 prevent caching POST response
                 });
                 const body = await res.json();
                 if (!res.ok) {
@@ -196,6 +191,8 @@ export default function AppointmentBooking() {
                 const res = await fetch(`/api/appointments/${id}`, {
                     method: "DELETE",
                     headers: { Authorization: `Bearer ${token}` },
+
+                    cache: "no-store",   // 🚀 prevent caching POST response
                 });
                 if (!res.ok) {
                     const body = await res.json().catch(() => ({}));

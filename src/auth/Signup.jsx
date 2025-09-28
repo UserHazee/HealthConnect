@@ -6,12 +6,13 @@ import { Link } from "react-router-dom";
 
 export default function Register() {
     let navigate = useNavigate();
-    const [name, setName] = useState("");
+    const [first_name, setFirstName] = useState("");
+    const [last_name, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
-    const [showPassword, setShowPassword] = useState(false); // 👁 state
+    const [showPassword, setShowPassword] = useState(false); 
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const validatePassword = (pwd) => {
@@ -24,13 +25,11 @@ export default function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // check confirm password
         if (password !== confirmPassword) {
             setError("Passwords do not match");
             return;
         }
 
-        // check weak password
         const pwdError = validatePassword(password);
         if (pwdError) {
             setError(pwdError);
@@ -41,13 +40,12 @@ export default function Register() {
             const res = await fetch("http://localhost:5000/api/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify({ first_name, last_name, email, password }),
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                // backend duplicate email handling
                 if (data.message && data.message.includes("Email already exists")) {
                     setError("Email already exists. Please use another one.");
                 } else {
@@ -98,18 +96,36 @@ export default function Register() {
 
                         {/* Form */}
                         <form className="space-y-6" onSubmit={handleSubmit}>
-                            {/* Name */}
+                            {/* First Name */}
                             <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                                    Full Name
+                                <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
+                                    First Name
                                 </label>
                                 <div className="mt-1">
                                     <input
                                         type="text"
-                                        id="name"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        placeholder="John Doe"
+                                        id="first_name"
+                                        value={first_name}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        placeholder="John"
+                                        required
+                                        className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Last Name */}
+                            <div>
+                                <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
+                                    Last Name
+                                </label>
+                                <div className="mt-1">
+                                    <input
+                                        type="text"
+                                        id="last_name"
+                                        value={last_name}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        placeholder="Doe"
                                         required
                                         className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
                                     />
@@ -149,7 +165,6 @@ export default function Register() {
                                         required
                                         className="block w-full rounded-md border border-gray-300 px-3 py-2 pr-10 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
                                     />
-                                    {/* 👁 Toggle */}
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
@@ -175,7 +190,6 @@ export default function Register() {
                                         required
                                         className="block w-full rounded-md border border-gray-300 px-3 py-2 pr-10 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
                                     />
-                                    {/* 👁 Toggle */}
                                     <button
                                         type="button"
                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}

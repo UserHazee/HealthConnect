@@ -17,7 +17,7 @@ import { Progress } from "@/components/ui/progress";
 import Layout from "../../components/ui/layout";
 import { useAuth } from "@/auth/AuthContext";
 
-const API_URL = import.meta.env.VITE_API_URL || "/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"; // 🔧 fallback to localhost
 
 // SECURITY MEASURES
 // Add input sanitization
@@ -26,7 +26,7 @@ const sanitizeInput = (input) => {
     return input.replace(/[<>]/g, ''); // Basic XSS protection
 };
 
-// Secure API calls
+// ✅ Fixed secureFetch - only call response.json() ONCE
 const secureFetch = async (url, token, options = {}) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
@@ -35,6 +35,7 @@ const secureFetch = async (url, token, options = {}) => {
         const response = await fetch(url, {
             ...options,
             signal: controller.signal,
+            cache: "no-store",  // 🚀 prevent 304 caching
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -43,9 +44,16 @@ const secureFetch = async (url, token, options = {}) => {
         });
 
         clearTimeout(timeoutId);
+        console.log("📡 Fetch status:", response.status); // 🔧
+
+        // ✅ Only parse once and store the result
+        const data = await response.json();
+        console.log("📋 API raw response:", data); // 🔧
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return await response.json();
+
+        // ✅ Return the already-parsed data instead of reading again
+        return data;
     } catch (error) {
         clearTimeout(timeoutId);
         if (error.name === 'AbortError') {
@@ -54,9 +62,6 @@ const secureFetch = async (url, token, options = {}) => {
         throw error;
     }
 };
-
-
-
 
 function AppointmentSkeleton() {
     return (
@@ -89,26 +94,22 @@ function AppointmentSkeleton() {
 }
 
 export default function Dashboard() {
-    const { token, user } = useAuth();
+    // Fixed: Import loading as authLoading to avoid conflicts
+    const { token, user, loading: authLoading } = useAuth();
+
+    // Fixed: Add back the missing upcomingAppointments state
+    const [upcomingAppointments, setUpcomingAppointments] = useState(null);
 
     // 🚀 Create user-specific cache key
     const getCacheKey = () => {
-        if (!user?.id) return null;
-        return `appointments_${user.id}`;
+        if (!user?.id) return null; // Changed from user?.id to user?.uid
+        return `appointments_${user.id}`; // Changed from user.id to user.uid
     };
 
-    // 🚀 KEY FIX: Initialize state from user-specific localStorage
-    const [upcomingAppointments, setUpcomingAppointments] = useState(() => {
+    // Fixed: Correct dashboardLoading state - should be boolean for loading status
+    const [dashboardLoading, setDashboardLoading] = useState(() => {
         const cacheKey = getCacheKey();
-        if (!cacheKey) return null;
-
-        const cached = localStorage.getItem(cacheKey);
-        try {
-            return cached ? JSON.parse(cached) : null;
-        } catch {
-            console.warn("Failed to parse cached appointments");
-            return null;
-        }
+        return cacheKey ? !localStorage.getItem(cacheKey) : true;
     });
 
     const [initialized, setInitialized] = useState(() => {
@@ -116,41 +117,61 @@ export default function Dashboard() {
         return cacheKey ? !!localStorage.getItem(cacheKey) : false;
     });
 
-    const [loading, setLoading] = useState(() => {
-        const cacheKey = getCacheKey();
-        return cacheKey ? !localStorage.getItem(cacheKey) : true;
-    });
-
     // Add refresh trigger
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+    // Fixed: Move debug console.log AFTER state declarations
+    console.log("🔍 Dashboard Auth States:", {
+        token: token ? "EXISTS" : "NULL",
+        user: user ? user : "NULL",
+        userId: user?.id || "NO ID", // Changed from user?.id to user?.uid
+        authLoading: authLoading,
+        dashboardLoading: dashboardLoading
+    });
+
+    // Add better API debugging
+    console.log("🔧 API URL:", API_URL);
 
     // 🎯 Logic to get next appointment and remaining appointments
     const getAppointmentData = (appointments) => {
-        // ... (implementation of getAppointmentData remains the same, but takes appointments as an argument)
         if (!appointments || !Array.isArray(appointments)) {
             console.log("No appointments array:", appointments);
             return { nextAppointment: null, remainingAppointments: [] };
         }
-        // ... (rest of filtering, sorting, and return logic for appointments)
+
         const now = new Date();
-        const futureAppointments = appointments.filter(appointment => {
-            const appointmentDate = appointment.appointment_date.split('T')[0];
-            const appointmentDateTime = new Date(`${appointmentDate}T${convertTo24Hour(appointment.appointment_time)}`);
+
+        // ✅ Keep only future appointments
+        const futureAppointments = appointments.filter((appointment) => {
+            const appointmentDateTime = new Date(appointment.appointment_date);
             return appointmentDateTime > now;
         });
 
-        const sortedAppointments = futureAppointments.sort((a, b) => {
-            const appointmentDateA = a.appointment_date.split('T')[0];
-            const appointmentDateB = b.appointment_date.split('T')[0];
-            const dateA = new Date(`${appointmentDateA}T${convertTo24Hour(a.appointment_time)}`);
-            const dateB = new Date(`${appointmentDateB}T${convertTo24Hour(b.appointment_time)}`);
-            return dateA - dateB;
+        // ✅ FIX: Sort by soonest (ascending order)
+        futureAppointments.sort((a, b) => {
+            const dateA = new Date(a.appointment_date);
+            const dateB = new Date(b.appointment_date);
+
+            // Compare dates first
+            if (dateA.getTime() !== dateB.getTime()) {
+                return dateA - dateB; // Soonest first
+            }
+
+            // If same date, compare times
+            const timeA = convertTo24Hour(a.appointment_time);
+            const timeB = convertTo24Hour(b.appointment_time);
+            return timeA.localeCompare(timeB);
         });
 
+        console.log("🔍 Sorted future appointments:", futureAppointments.map(apt => ({
+            id: apt.id,
+            date: apt.appointment_date,
+            time: apt.appointment_time
+        })));
+
         return {
-            nextAppointment: sortedAppointments[0] || null,
-            remainingAppointments: sortedAppointments.slice(1)
+            nextAppointment: futureAppointments[0] || null,
+            remainingAppointments: futureAppointments.slice(1),
         };
     };
 
@@ -165,7 +186,7 @@ export default function Dashboard() {
             hours = '00';
         }
         if (modifier?.toUpperCase() === 'PM') {
-            hours = String(parseInt(hours, 10) + 12); // Convert to string
+            hours = String(parseInt(hours, 10) + 12);
         }
 
         return `${hours.padStart(2, '0')}:${minutes}`;
@@ -173,14 +194,11 @@ export default function Dashboard() {
 
     // Helper function to format appointment date
     const formatAppointmentDate = (dateString) => {
-        // Handle ISO timestamp format from database
-        const appointmentDate = dateString.split('T')[0]; // Extract '2025-09-24' from '2025-09-24T16:00:00.000Z'
-        const date = new Date(appointmentDate + 'T00:00:00'); // Add time to avoid timezone issues
+        const date = new Date(dateString); // ✅ Use the full ISO string directly
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
-        // Compare just the date parts
         const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
@@ -193,51 +211,77 @@ export default function Dashboard() {
             return date.toLocaleDateString("en-US", {
                 weekday: "long",
                 month: "short",
-                day: "numeric"
+                day: "numeric",
             });
         }
     };
 
 
+    // Clear old integer-based cache keys
+    useEffect(() => {
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key?.startsWith('appointments_') && key.match(/appointments_\d+$/)) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+    }, []);
+
+    // Fixed: Main fetch effect using correct variables
     useEffect(() => {
         const fetchAppointments = async () => {
-            if (!token) {
-                setLoading(false);
+            // Wait for auth context to finish loading
+            if (authLoading) {
+                console.log("Auth context still loading, waiting...");
                 return;
             }
 
-            const cacheKey = getCacheKey();
-            if (!cacheKey) {
-                setLoading(false);
+            // If no token after loading is complete, user is not logged in
+            if (!token) {
+                console.log("No token after auth loading complete");
+                setDashboardLoading(false);
                 return;
             }
+
+            // If no user data after loading, something is wrong
+            if (!user?.id) {
+                console.log("No user UID after auth loading complete", { user });
+                setDashboardLoading(false);
+                return;
+            }
+
+            const cacheKey = `appointments_${user.id}`;
 
             try {
-                // 💡 FIX: Replace standard fetch with the secureFetch function
-                const data = await secureFetch(`${API_URL}/appointments`, token); // Pass URL and token
+                console.log("Fetching appointments for user:", user.id);
 
-                // If the call succeeds (secureFetch throws on non-2xx status),
-                // 'data' will be the parsed JSON object.
-                setUpcomingAppointments(data || []);
-                localStorage.setItem(cacheKey, JSON.stringify(data || []));
+                // secureFetch should handle the response parsing ONCE
+                const data = await secureFetch(`${API_URL}/appointments`, token);
+
+                // 🔧 Normalize: backend may return {appointments: []} or just []
+                const appointments = data.appointments || data || [];
+                console.log("✅ Final parsed appointments:", appointments);
+                console.log("✅ Final parsed appointments:", appointments);
+                console.log("🔍 First appointment structure:", appointments[0]);
+                console.log("🔍 Total appointments count:", appointments.length);
+
+
+                setUpcomingAppointments(appointments);
+                localStorage.setItem(cacheKey, JSON.stringify(appointments));
 
             } catch (err) {
-                console.error("Error fetching appointments:", err.message); // Logs the structured error message
-
-                // Clear cache only on specific errors like 401/404 if needed, 
-                // but for simplicity, we treat any secureFetch error as a failure
-                // and clear the cache to ensure fresh data on next load.
-                localStorage.removeItem(cacheKey);
+                console.error("Error fetching appointments:", err.message);
                 setUpcomingAppointments([]);
-
             } finally {
                 setInitialized(true);
-                setLoading(false);
+                setDashboardLoading(false);
             }
         };
 
         fetchAppointments();
-    }, [token, user?.id, refreshTrigger]);
+    }, [token, user?.id, authLoading]); // Make sure dependencies are correct
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -245,22 +289,21 @@ export default function Dashboard() {
 
     const { nextAppointment, remainingAppointments } = useMemo(() => {
         return getAppointmentData(upcomingAppointments);
-    }, [upcomingAppointments]); // Only recalculate when appointments change
+    }, [upcomingAppointments]);
 
-    // Memoize functions that are passed as props
+    // Fixed: Update refreshAppointments to use correct loading setter
     const refreshAppointments = useCallback(() => {
         setRefreshTrigger(prev => prev + 1);
-        setLoading(true);
+        setDashboardLoading(true);
     }, []);
 
     return (
         <Layout>
-            {/* UI remains unchanged */}
             <div className="mb-8 lg:mb-12">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div>
                         <h1 className="mb-2 text-2xl font-bold lg:text-4xl text-slate-800">
-                            Good morning, Sophia! 🌅
+                            Good morning, {user?.first_name || 'User'}! 🌅
                         </h1>
                         <p className="text-base text-slate-600 lg:text-lg">
                             Here's your health overview for today
@@ -351,15 +394,23 @@ export default function Dashboard() {
                         Upcoming Appointments
                     </h2>
                 </div>
+                {/* ✅ Clean Debug Info */}
+                <div style={{ background: '#f0f9ff', padding: '10px', margin: '10px 0', border: '1px solid #bae6fd', borderRadius: '8px' }}>
+                    <p className="text-sm text-slate-600">
+                        <strong>Appointments:</strong> {upcomingAppointments ? upcomingAppointments.length : 0} total,
+                        <strong> Next:</strong> {nextAppointment ? `ID ${nextAppointment.id} (${formatAppointmentDate(nextAppointment.appointment_date)})` : 'None'},
+                        <strong> Remaining:</strong> {remainingAppointments ? remainingAppointments.length : 0}
+                    </p>
+                </div>
 
                 <AnimatePresence mode="wait">
-                    {loading ? (
+                    {dashboardLoading ? (
                         <div className="grid gap-4 lg:gap-6">
                             <AppointmentSkeleton key="skeleton1" />
                             <AppointmentSkeleton key="skeleton2" />
                             <AppointmentSkeleton key="skeleton3" />
                         </div>
-                    ) : remainingAppointments.length === 0 ? (
+                    ) : !remainingAppointments || remainingAppointments.length === 0 ? (
                         <motion.p
                             key="empty"
                             initial={{ opacity: 0 }}
@@ -417,6 +468,26 @@ export default function Dashboard() {
 
             {/* Health Summary */}
             <section>
+                {/* ✅ TEMPORARY DEBUG - Add this */}
+                <div style={{ background: '#f0f9ff', padding: '10px', margin: '10px 0', border: '1px solid #bae6fd', borderRadius: '8px' }}>
+                    <h4 className="font-semibold text-slate-700">🔍 Detailed Debug:</h4>
+                    <p className="text-sm">Total appointments: {upcomingAppointments ? upcomingAppointments.length : 0}</p>
+                    <p className="text-sm">Next appointment ID: {nextAppointment ? nextAppointment.id : 'None'}</p>
+                    <p className="text-sm">Remaining appointments: {remainingAppointments ? remainingAppointments.length : 0}</p>
+                    {remainingAppointments && remainingAppointments.length > 0 && (
+                        <p className="text-sm">Remaining IDs: {remainingAppointments.map(apt => apt.id).join(', ')}</p>
+                    )}
+                    {upcomingAppointments && (
+                        <div className="mt-2">
+                            <p className="text-sm font-semibold">All Appointments:</p>
+                            {upcomingAppointments.map((apt, index) => (
+                                <p key={apt.id} className="text-sm">
+                                    #{index + 1}: ID {apt.id} - {apt.doctor} - {apt.appointment_date}
+                                </p>
+                            ))}
+                        </div>
+                    )}
+                </div>
                 <h2 className="mb-6 text-xl font-bold lg:text-2xl text-slate-800">
                     Health Summary
                 </h2>

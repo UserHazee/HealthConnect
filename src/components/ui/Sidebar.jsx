@@ -1,9 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 import {
     ChevronRight,
     X,
+    LogOut,
     Menu,
     Plus,
     Bell,
@@ -12,6 +15,28 @@ import {
     FolderOpen,
     Settings as SettingsIcon,
 } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogFooter,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from "@/components/ui/alert-dialog"
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
+
+
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
@@ -22,6 +47,15 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         { label: "Appointment_History", path: "/appointment_history", icon: FolderOpen },
         { label: "Settings", path: "/settings", icon: SettingsIcon },
     ];
+
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleSignOut = () => {
+        logout(); // Clear token + user
+        navigate("/"); // Redirect to login/homepage
+    };
+
 
     return (
         <>
@@ -99,18 +133,68 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
                     {/* Quick Actions */}
                     <div className="p-4 border-t border-slate-100 space-y-3">
-                        <Button className="w-full text-white bg-gradient-to-r from-blue-500 to-purple-500">
-                            <Plus className="w-4 h-4 mr-2" /> Book Appointment
-                        </Button>
-                        <Button variant="outline" className="w-full">
-                            <Bell className="w-4 h-4 mr-2" /> Notifications
-                        </Button>
+                        <div className="flex  gap-2">
+                            <Button className="w-full" variant="outline"
+                                onClick={() => {
+                                    navigate("/appointments");
+                                }}>
+                                <Plus className="w-4 h-4 mr-2" /> Book
+                            </Button>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button className="w-full" variant="outline">
+                                        <Bell className="w-4 h-4 mr-2" /> Notification
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Notifications</DialogTitle>
+                                        <DialogDescription>
+                                            Receive timely notifications about your appointment,
+                                            including reminders and any changes to the schedule.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter>
+                                        <Button onClick={() => setSidebarOpen(false)}>Close</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                     </div>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className="w-full text-red-500 hover:text-red-500"
+                            >
+                                <LogOut className="w-4 h-4 mr-2 text-red-500" /> Sign Out
+                            </Button>
+                        </AlertDialogTrigger>
+
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This will log you out of your account. You’ll need to log in again to access your dashboard.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                    onClick={handleSignOut}
+                                >
+                                    Yes, log out
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
                 </div>
             </div>
+        </div >
 
-            {/* Top Navbar for mobile */}
-            <div className="sticky top-0 z-30 p-4 border-b lg:hidden bg-white/95 backdrop-blur-xl border-slate-200/60 flex justify-between items-center">
+            {/* Top Navbar for mobile */ }
+            < div className = "sticky top-0 z-30 p-4 border-b lg:hidden bg-white/95 backdrop-blur-xl border-slate-200/60 flex justify-between items-center" >
                 <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
                     <Menu className="w-5 h-5" />
                 </Button>
@@ -120,7 +204,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 <Button variant="ghost" size="icon">
                     <Bell className="w-5 h-5" />
                 </Button>
-            </div>
+            </div >
         </>
     );
 }

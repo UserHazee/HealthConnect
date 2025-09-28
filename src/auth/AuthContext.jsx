@@ -13,6 +13,17 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState("");
 
+  // Normalize backend user → always has { id, email }
+  const normalizeUser = (rawUser) => {
+    if (!rawUser) return null;
+    return {
+      id: rawUser.id || rawUser.uid || rawUser.user_id || null, // ✅ fallback mapping
+      email: rawUser.email || null,
+      name: rawUser.name || rawUser.fullName || null,
+      ...rawUser, // keep other fields (role, created_at, etc.)
+    };
+  };
+
   // 🔹 Fetch current user if token exists
   useEffect(() => {
     const fetchUser = async () => {
@@ -24,12 +35,15 @@ export function AuthProvider({ children }) {
       try {
         const res = await fetch(`${API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store", // 🚀 prevent 304
         });
 
         if (!res.ok) throw new Error("Invalid or expired token");
 
         const data = await res.json();
-        setUser(data);
+        console.log("🔑 /auth/me raw:", data); // 🔧 debug log
+
+        setUser(normalizeUser(data));
         setAuthError("");
       } catch (err) {
         console.error("Auth fetch error:", err);
@@ -70,7 +84,9 @@ export function AuthProvider({ children }) {
         headers: { Authorization: `Bearer ${data.token}` },
       });
       const userData = await meRes.json();
-      setUser(userData);
+
+      console.log("🔑 /auth/me after login:", userData); // 🔧 debug
+      setUser(normalizeUser(userData));
     } catch (err) {
       console.error("Login error:", err);
       setAuthError(err.message || "Login failed");
@@ -91,7 +107,7 @@ export function AuthProvider({ children }) {
       value={{
         user,
         token,
-        isAuthenticated: !!token, // ✅ smoother remember me
+        isAuthenticated: !!token,
         login,
         logout,
         loading,
