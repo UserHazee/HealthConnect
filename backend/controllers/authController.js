@@ -15,7 +15,7 @@ export const login = async (req, res) => {
 
     const db = getDB();
     const [rows] = await db.execute(
-      "SELECT * FROM UID WHERE LOWER(email) = LOWER(?)",
+      "SELECT * FROM users WHERE LOWER(email) = LOWER(?)",
       [email]
     );
 
@@ -83,7 +83,7 @@ export const register = async (req, res) => {
         const db = getDB();
 
         // 1. Check if email already exists
-        const [existingUser] = await db.execute("SELECT email FROM UID WHERE email = ?", [email]);
+        const [existingUser] = await db.execute("SELECT email FROM users WHERE email = ?", [email]);
         if (existingUser.length > 0) {
             return res.status(409).json({ message: "Email already exists" });
         }
@@ -97,7 +97,7 @@ export const register = async (req, res) => {
 
         // 4. Insert new user
         const sql = `
-            INSERT INTO UID (uid, first_name, last_name, email, password)
+            INSERT INTO users (uid, first_name, last_name, email, password)
             VALUES (?, ?, ?, ?, ?)
         `;
         await db.execute(sql, [uid, first_name, last_name, email, hashedPassword]);

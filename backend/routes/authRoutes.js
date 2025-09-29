@@ -37,7 +37,7 @@ router.get("/me", authenticateToken, async (req, res) => {
     console.log("🔍 Searching for user with uid:", req.user.id);
     
     const [rows] = await db.execute(
-      "SELECT uid As id, first_name, last_name, email FROM UID WHERE uid = ?",
+      "SELECT uid As id, first_name, last_name, email FROM users WHERE uid = ?",
       [req.user.id]
     );
 

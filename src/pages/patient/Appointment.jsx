@@ -5,8 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import Layout from "../../components/ui/layout";
 import { useAuth } from "../../auth/AuthContext"; // ✅ Import Auth
 
+
 export default function AppointmentBooking() {
-    const { token } = useAuth(); // ✅ Get logged-in user’s token
+    // ✅ Get logged-in user’s token
+    const { token, user } = useAuth(); 
+
 
     const [selectedDepartment, setSelectedDepartment] = useState("");
     const [selectedDoctor, setSelectedDoctor] = useState("");
